@@ -109,8 +109,8 @@ Before you begin, ensure you have the following installed:
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/yourusername/fin-track.git
-   cd fin-track
+   git clone https://github.com/majiddevv/FinTrack.git
+   cd FinTrack
    ```
 
 2. **Set up the Backend**
@@ -160,7 +160,7 @@ For detailed setup instructions, see:
 ## 📁 Project Structure
 
 ```
-fin-track/
+FinTrack/
 ├── backend/                 # Node.js + Express API
 │   ├── config/             # Database configuration
 │   ├── controllers/        # Request handlers
