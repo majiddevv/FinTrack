@@ -1,13 +1,25 @@
-import { useState } from 'react';
-import { Link, useNavigate, Navigate } from 'react-router-dom';
-import { Eye, EyeOff, TrendingUp, ArrowRight, Check } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { LoadingSpinner } from '../../components/common';
+import { useState } from "react";
+import { Link, useNavigate, Navigate } from "react-router-dom";
+import {
+  Eye,
+  EyeOff,
+  TrendingUp,
+  ArrowRight,
+  Check,
+  AlertCircle,
+} from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import { LoadingSpinner } from "../../components/common";
 
 const Signup = () => {
   const navigate = useNavigate();
   const { register, isAuthenticated, loading: authLoading } = useAuth();
-  const [formData, setFormData] = useState({ fullName: '', email: '', password: '', confirmPassword: '' });
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -26,12 +38,15 @@ const Signup = () => {
 
   const validate = () => {
     const newErrors = {};
-    if (!formData.fullName) newErrors.fullName = 'Full name is required';
-    if (!formData.email) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Invalid email';
-    if (!formData.password) newErrors.password = 'Password is required';
-    else if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
+    if (!formData.fullName) newErrors.fullName = "Full name is required";
+    if (!formData.email) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Invalid email";
+    if (!formData.password) newErrors.password = "Password is required";
+    else if (formData.password.length < 8)
+      newErrors.password = "Password must be at least 8 characters";
+    if (formData.password !== formData.confirmPassword)
+      newErrors.confirmPassword = "Passwords do not match";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -40,20 +55,27 @@ const Signup = () => {
     e.preventDefault();
     if (!validate()) return;
 
+    setErrors({}); // Clear previous errors
     setLoading(true);
-    const success = await register(formData.fullName, formData.email, formData.password);
+    const result = await register(
+      formData.fullName,
+      formData.email,
+      formData.password
+    );
     setLoading(false);
 
-    if (success) {
-      navigate('/dashboard');
+    if (result.success) {
+      navigate("/dashboard");
+    } else {
+      setErrors({ general: result.error });
     }
   };
 
   const features = [
-    'Track income and expenses',
-    'Create custom categories',
-    'Set monthly budgets',
-    'View detailed reports',
+    "Track income and expenses",
+    "Create custom categories",
+    "Set monthly budgets",
+    "View detailed reports",
   ];
 
   return (
@@ -101,21 +123,36 @@ const Signup = () => {
           </div>
 
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">Create an account</h2>
-            <p className="text-gray-500 mt-2">Start tracking your finances for free</p>
+            <h2 className="text-3xl font-bold text-gray-900">
+              Create an account
+            </h2>
+            <p className="text-gray-500 mt-2">
+              Start tracking your finances for free
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {errors.general && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <p className="text-red-700 text-sm">{errors.general}</p>
+              </div>
+            )}
+
             <div>
               <label className="label">Full Name</label>
               <input
                 type="text"
                 value={formData.fullName}
-                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                className={`input ${errors.fullName ? 'input-error' : ''}`}
+                onChange={(e) =>
+                  setFormData({ ...formData, fullName: e.target.value })
+                }
+                className={`input ${errors.fullName ? "input-error" : ""}`}
                 placeholder="John Doe"
               />
-              {errors.fullName && <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>}
+              {errors.fullName && (
+                <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
+              )}
             </div>
 
             <div>
@@ -123,21 +160,29 @@ const Signup = () => {
               <input
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className={`input ${errors.email ? 'input-error' : ''}`}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                className={`input ${errors.email ? "input-error" : ""}`}
                 placeholder="you@example.com"
               />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
             </div>
 
             <div>
               <label className="label">Password</label>
               <div className="relative">
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className={`input pr-10 ${errors.password ? 'input-error' : ''}`}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  className={`input pr-10 ${
+                    errors.password ? "input-error" : ""
+                  }`}
                   placeholder="••••••••"
                 />
                 <button
@@ -145,10 +190,16 @@ const Signup = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
-              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+              )}
             </div>
 
             <div>
@@ -156,21 +207,42 @@ const Signup = () => {
               <input
                 type="password"
                 value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                className={`input ${errors.confirmPassword ? 'input-error' : ''}`}
+                onChange={(e) =>
+                  setFormData({ ...formData, confirmPassword: e.target.value })
+                }
+                className={`input ${
+                  errors.confirmPassword ? "input-error" : ""
+                }`}
                 placeholder="••••••••"
               />
-              {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.confirmPassword}
+                </p>
+              )}
             </div>
 
-            <button type="submit" disabled={loading} className="btn btn-primary w-full flex items-center justify-center gap-2">
-              {loading ? <LoadingSpinner size="sm" /> : <>Create Account <ArrowRight className="w-4 h-4" /></>}
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn btn-primary w-full flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <LoadingSpinner size="sm" />
+              ) : (
+                <>
+                  Create Account <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
           </form>
 
           <p className="text-center text-gray-500 mt-6">
-            Already have an account?{' '}
-            <Link to="/login" className="text-primary-600 hover:text-primary-700 font-medium">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="text-primary-600 hover:text-primary-700 font-medium"
+            >
               Sign in
             </Link>
           </p>
@@ -181,4 +253,3 @@ const Signup = () => {
 };
 
 export default Signup;
-

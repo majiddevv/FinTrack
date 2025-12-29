@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import { Link, useNavigate, Navigate } from 'react-router-dom';
-import { Eye, EyeOff, TrendingUp, ArrowRight } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { LoadingSpinner } from '../../components/common';
+import { useState } from "react";
+import { Link, useNavigate, Navigate } from "react-router-dom";
+import { Eye, EyeOff, TrendingUp, ArrowRight, AlertCircle } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import { LoadingSpinner } from "../../components/common";
 
 const Login = () => {
   const navigate = useNavigate();
   const { login, isAuthenticated, loading: authLoading } = useAuth();
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -26,9 +26,10 @@ const Login = () => {
 
   const validate = () => {
     const newErrors = {};
-    if (!formData.email) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Invalid email';
-    if (!formData.password) newErrors.password = 'Password is required';
+    if (!formData.email) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Invalid email";
+    if (!formData.password) newErrors.password = "Password is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -37,12 +38,15 @@ const Login = () => {
     e.preventDefault();
     if (!validate()) return;
 
+    setErrors({}); // Clear previous errors
     setLoading(true);
-    const success = await login(formData.email, formData.password);
+    const result = await login(formData.email, formData.password);
     setLoading(false);
 
-    if (success) {
-      navigate('/dashboard');
+    if (result.success) {
+      navigate("/dashboard");
+    } else {
+      setErrors({ general: result.error });
     }
   };
 
@@ -62,7 +66,8 @@ const Login = () => {
             Take control of your finances with ease
           </h1>
           <p className="text-primary-100 text-lg">
-            Track income and expenses, set budgets, and gain insights into your spending habits.
+            Track income and expenses, set budgets, and gain insights into your
+            spending habits.
           </p>
         </div>
 
@@ -86,30 +91,47 @@ const Login = () => {
 
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900">Welcome back</h2>
-            <p className="text-gray-500 mt-2">Sign in to your account to continue</p>
+            <p className="text-gray-500 mt-2">
+              Sign in to your account to continue
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {errors.general && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <p className="text-red-700 text-sm">{errors.general}</p>
+              </div>
+            )}
+
             <div>
               <label className="label">Email</label>
               <input
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className={`input ${errors.email ? 'input-error' : ''}`}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                className={`input ${errors.email ? "input-error" : ""}`}
                 placeholder="you@example.com"
               />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
             </div>
 
             <div>
               <label className="label">Password</label>
               <div className="relative">
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className={`input pr-10 ${errors.password ? 'input-error' : ''}`}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  className={`input pr-10 ${
+                    errors.password ? "input-error" : ""
+                  }`}
                   placeholder="••••••••"
                 />
                 <button
@@ -117,20 +139,39 @@ const Login = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
-              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+              )}
             </div>
 
-            <button type="submit" disabled={loading} className="btn btn-primary w-full flex items-center justify-center gap-2">
-              {loading ? <LoadingSpinner size="sm" /> : <>Sign In <ArrowRight className="w-4 h-4" /></>}
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn btn-primary w-full flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <LoadingSpinner size="sm" />
+              ) : (
+                <>
+                  Sign In <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
           </form>
 
           <p className="text-center text-gray-500 mt-6">
-            Don't have an account?{' '}
-            <Link to="/signup" className="text-primary-600 hover:text-primary-700 font-medium">
+            Don't have an account?{" "}
+            <Link
+              to="/signup"
+              className="text-primary-600 hover:text-primary-700 font-medium"
+            >
               Sign up
             </Link>
           </p>
@@ -141,4 +182,3 @@ const Login = () => {
 };
 
 export default Login;
-
